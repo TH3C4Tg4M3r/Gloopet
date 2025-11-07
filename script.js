@@ -1,4 +1,4 @@
-let userEmail = null; // will store the logged-in user's email
+let userEmail = null;
 let coins = 0;
 let collection = {};
 let packs = {};
@@ -6,37 +6,53 @@ let packs = {};
 const packsDiv = document.getElementById("packs");
 const resultDiv = document.getElementById("result");
 const collectionDiv = document.getElementById("collectionList");
+const container = document.getElementById("gloopit-container");
 
-// --- CHECK SESSION ---
+// --- INITIALIZE ---
+document.addEventListener("DOMContentLoaded", checkSession);
+
 async function checkSession() {
-  const res = await fetch("/session");
-  const data = await res.json();
-  if (!data.loggedIn) {
-    // not logged in, redirect to login page
+  try {
+    const res = await fetch("/session");
+    const data = await res.json();
+
+    if (!data.loggedIn) {
+      // Not logged in → redirect to login page
+      window.location.href = "login.html";
+      return;
+    }
+
+    userEmail = data.email;
+    container.style.display = "block"; // show Gloopit UI
+    await loadUserData();
+  } catch (err) {
+    console.error("Error checking session:", err);
     window.location.href = "login.html";
-    return;
   }
-  userEmail = data.email;
-  await loadUserData();
 }
 
-// --- LOAD USER COINS & COLLECTION ---
+// --- LOAD USER DATA FROM SERVER ---
 async function loadUserData() {
-  // Load coins
-  const res = await fetch("/coins");
-  const data = await res.json();
-  coins = data.coins;
-  document.getElementById("coins").textContent = coins;
+  try {
+    // Fetch coins
+    const resCoins = await fetch("/coins");
+    const coinData = await resCoins.json();
+    coins = coinData.coins;
+    document.getElementById("coins").textContent = coins;
 
-  // Load collection from server-side users.json
-  const usersData = await fetch("/users.json").then(r => r.json());
-  collection = usersData[userEmail].collection || {};
-  updateCollection();
+    // Fetch user collection from server
+    const usersData = await fetch("/users.json").then(r => r.json());
+    collection = usersData[userEmail].collection || {};
+    updateCollection();
 
-  // Load packs
-  const res2 = await fetch("packs.json");
-  packs = await res2.json();
-  showPacks();
+    // Fetch packs
+    const packsRes = await fetch("packs.json");
+    packs = await packsRes.json();
+    showPacks();
+
+  } catch (err) {
+    console.error("Error loading user data:", err);
+  }
 }
 
 // --- UPDATE COLLECTION DISPLAY ---
@@ -46,7 +62,7 @@ function updateCollection() {
     .join("") || "(empty)";
 }
 
-// --- SHOW PACKS ---
+// --- SHOW AVAILABLE PACKS ---
 function showPacks() {
   packsDiv.innerHTML = "";
   for (const [name, data] of Object.entries(packs)) {
@@ -71,9 +87,9 @@ async function openPack(name) {
     return;
   }
 
-  // Subtract coins on server
+  // Subtract coins on server (admin key required)
   coins -= pack.cost;
-  await fetch("/coins/" + userEmail, {
+  await fetch("/coins/" + encodeURIComponent(userEmail), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -81,9 +97,10 @@ async function openPack(name) {
     },
     body: JSON.stringify({ coins })
   });
+
   document.getElementById("coins").textContent = coins;
 
-  // Determine random blook
+  // Randomly select blook
   const rand = Math.random();
   let cumulative = 0;
   for (const blook of pack.blooks) {
@@ -96,7 +113,7 @@ async function openPack(name) {
   }
 }
 
-// --- SHOW RESULT ---
+// --- SHOW PACK RESULT ---
 function showResult(blook) {
   resultDiv.innerHTML = `
     <div class="blook">
@@ -107,7 +124,7 @@ function showResult(blook) {
   `;
 }
 
-// --- ADD TO COLLECTION ---
+// --- ADD BLOOK TO COLLECTION ---
 async function addToCollection(blook) {
   if (!collection[blook.name]) collection[blook.name] = 0;
   collection[blook.name]++;
@@ -115,7 +132,7 @@ async function addToCollection(blook) {
   // Update collection on server
   const usersData = await fetch("/users.json").then(r => r.json());
   usersData[userEmail].collection = collection;
-  // overwrite users.json with updated collection
+
   await fetch("/updateCollection", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -124,6 +141,3 @@ async function addToCollection(blook) {
 
   updateCollection();
 }
-
-// --- INITIALIZE ---
-checkSession();
