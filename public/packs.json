@@ -1,0 +1,20 @@
+{
+  "Starter Pack": {
+    "cost": 25,
+    "blooks": [
+      { "name": "Blue Blob", "rarity": "Common", "chance": 0.5 },
+      { "name": "Green Blob", "rarity": "Uncommon", "chance": 0.3 },
+      { "name": "Golden Blob", "rarity": "Rare", "chance": 0.15 },
+      { "name": "Shadow Blob", "rarity": "Legendary", "chance": 0.05 }
+    ]
+  },
+  "Mystery Pack": {
+    "cost": 100,
+    "blooks": [
+      { "name": "Crystal Gloop", "rarity": "Epic", "chance": 0.25 },
+      { "name": "Ruby Gloop", "rarity": "Legendary", "chance": 0.15 },
+      { "name": "Obsidian Gloop", "rarity": "Mythic", "chance": 0.05 },
+      { "name": "Trash Gloop", "rarity": "Common", "chance": 0.55 }
+    ]
+  }
+}
