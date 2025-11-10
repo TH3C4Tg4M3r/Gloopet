@@ -1,101 +1,51 @@
 body {
-  font-family: "Poppins", sans-serif;
-  background: radial-gradient(circle at top, #0b132b, #1c2541);
-  color: #e0e0ff;
-  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #0f1b3a;
+  color: white;
   text-align: center;
-  transition: background 1s;
-}
-
-/* LOGIN PAGE */
-.login-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.login-container {
-  background: rgba(30, 45, 80, 0.9);
-  padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 0 20px rgba(0, 50, 150, 0.4);
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
 }
 
 input {
-  display: block;
-  width: 220px;
-  margin: 10px auto;
-  padding: 10px;
-  border: none;
-  border-radius: 10px;
+  padding: 5px;
+  margin: 5px;
 }
 
 button {
-  margin-top: 10px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 12px;
-  background: #3a506b;
-  color: white;
+  padding: 5px 10px;
+  margin: 5px;
   cursor: pointer;
-  transition: 0.2s;
-}
-
-button:hover {
-  background: #5bc0be;
-}
-
-.secondary {
-  background: #1c2541;
-}
-
-/* SHOP PAGE */
-.shop-body {
-  padding: 20px;
-}
-
-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #0b132b;
-  padding: 10px 20px;
-  border-radius: 0 0 10px 10px;
-}
-
-.pack-img {
-  width: 150px;
+  background-color: #1e2f5f;
+  border: none;
+  color: white;
   transition: transform 0.2s;
 }
 
-.pack-img:hover {
+button:hover {
   transform: scale(1.1);
 }
 
-#result {
-  margin: 20px;
-  font-size: 1.2em;
-}
-
-.blob-grid {
+.blobs-container {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  gap: 15px;
+  flex-wrap: wrap;
+  margin: 20px;
 }
 
-.blob-grid div {
-  background: #1c2541;
-  border-radius: 10px;
+.blob {
+  margin: 10px;
   padding: 10px;
-  width: 120px;
+  border: 1px solid white;
+  border-radius: 10px;
+  width: 100px;
   text-align: center;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+  transition: transform 0.3s;
+}
+
+.blob img {
+  width: 80px;
+  height: 80px;
+}
+
+.blob:hover {
+  transform: scale(1.2);
 }
