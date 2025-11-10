@@ -1,25 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gloopet | Login</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<title>Gloopet</title>
+<link rel="stylesheet" href="style.css">
 </head>
-<body class="login-body">
-  <div class="login-container">
-    <h1>🐾 Gloopet</h1>
-    <p class="tagline">Collect blobs, earn tokens!</p>
+<body>
 
-    <div class="form-container">
-      <input id="email" type="email" placeholder="Email" />
-      <input id="password" type="password" placeholder="Password" />
-      <button id="loginBtn">Login</button>
-      <button id="signupBtn" class="secondary">Sign Up</button>
-      <p id="message"></p>
-    </div>
+<div id="login-signup">
+  <h1>Gloopet</h1>
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="signup(email.value,password.value)">Sign Up</button>
+  <button onclick="login(email.value,password.value)">Login</button>
+  <div id="login-error"></div>
+</div>
+
+<div id="main" style="display:none;">
+  <h1>Shop</h1>
+  <div id="coins">Coins: 0</div>
+  <div id="blobs" class="blobs-container"></div>
+  <div id="shop">
+    <h2>Blob Pack</h2>
+    <button onclick="buyPack('Blob Pack')">Buy Pack (100 coins)</button>
   </div>
+</div>
 
-  <script src="script.js"></script>
+<script>
+const backend = "https://YOUR-RENDER-BACKEND.onrender.com/"; // put your backend URL here
+
+// Signup
+async function signup(email,password){
+  const res = await fetch(backend+"signup",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({email,password})
+  });
+  const data = await res.json();
+  if(data.success){
+    localStorage.setItem("token",data.token);
+    showMain();
+    loadUserData();
+  } else document.getElementById("login-error").innerText=data.error;
+}
+
+// Login
+async function login(email,password){
+  const res = await fetch(backend+"login",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({email,password})
+  });
+  const data = await res.json();
+  if(data.success){
+    localStorage.setItem("token",data.token);
+    showMain();
+    loadUserData();
+  } else document.getElementById("login-error").innerText=data.error;
+}
+
+// Show main shop page
+function showMain(){
+  document.getElementById("login-signup").style.display="none";
+  document.getElementById("main").style.display="block";
+}
+
+// Load user coins and blobs
+async function loadUserData(){
+  const token = localStorage.getItem("token");
+  if(!token) return;
+
+  const res = await fetch(backend+"userdata",{headers:{Authorization:token}});
+  const data = await res.json();
+  if(data.error){ alert("Please log in"); return; }
+
+  document.getElementById("coins").innerText=`Coins: ${data.coins}`;
+  const blobContainer = document.getElementById("blobs");
+  blobContainer.innerHTML="";
+  for(let [name,qty] of Object.entries(data.blobs)){
+    blobContainer.innerHTML+=`<div class="blob">
+      <img src="images/${name.replace(" ","").toLowerCase()}.png" alt="${name}">
+      <div>${name}: ${qty}</div>
+    </div>`;
+  }
+}
+
+// Buy a pack
+async function buyPack(pack){
+  const token = localStorage.getItem("token");
+  const res = await fetch(backend+"buy-pack",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":token},
+    body:JSON.stringify({pack})
+  });
+  const data = await res.json();
+  if(data.error) alert(data.error); else loadUserData();
+}
+
+// Auto-login if token exists
+if(localStorage.getItem("token")){ showMain(); loadUserData(); }
+</script>
+
 </body>
 </html>
